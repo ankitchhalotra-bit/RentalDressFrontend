@@ -125,6 +125,10 @@ import { AuthProvider, AuthContext } from './context/AuthContext';
 import AuthPage from './pages/AuthPage';
 import Shop from './pages/Shop';
 import AdminDashboard from './pages/AdminDashboard';
+import DressList from './pages/DressList';
+import DressDetail from './pages/DressDetail';
+import BookingConfirmation from './pages/BookingConfirmation';
+import MyBookings from './pages/MyBookings';
 
 const ProtectedRoute = ({ children, requiredRole }) => {
   const { user } = useContext(AuthContext);
@@ -139,7 +143,8 @@ function AppRoutes() {
   return (
     <>
       <nav style={{ padding: '10px', background: '#eee', display: 'flex', gap: '15px', alignItems: 'center' }}>
-        <Link to="/">Shop</Link>
+        <Link to="/dresses">Browse Dresses</Link>
+        {user && <Link to="/bookings">My Bookings</Link>}
         {!user && <Link to="/auth">Login / Register</Link>}
         {user?.role === 'ROLE_ADMIN' && <Link to="/admin">Admin Dashboard</Link>}
         {user && (
@@ -164,7 +169,20 @@ function AppRoutes() {
 
       <Routes>
         <Route path="/auth" element={<AuthPage />} />
-        <Route path="/" element={
+        <Route path="/" element={<Navigate to="/dresses" />} />
+        <Route path="/dresses" element={<DressList />} />
+        <Route path="/dresses/:dressId" element={<DressDetail />} />
+        <Route path="/bookings" element={
+          <ProtectedRoute>
+            <MyBookings />
+          </ProtectedRoute>
+        } />
+        <Route path="/bookings/:bookingId" element={
+          <ProtectedRoute>
+            <BookingConfirmation />
+          </ProtectedRoute>
+        } />
+        <Route path="/shop" element={
           <ProtectedRoute>
             <Shop />
           </ProtectedRoute>
@@ -181,10 +199,10 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <Router>
+      <AuthProvider>
         <AppRoutes />
-      </Router>
-    </AuthProvider>
+      </AuthProvider>
+    </Router>
   );
 }
