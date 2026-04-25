@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api from '../api/axiosInstance';
+import { useDressAPI } from '../api/useDressAPI';
 import { AuthContext } from '../context/AuthContext';
 import './DressDetail.css';
 
@@ -8,8 +8,9 @@ export default function DressDetail() {
     const { dressId } = useParams();
     const navigate = useNavigate();
     const { user } = useContext(AuthContext);
+    const { getDressById, checkAvailability: checkDressAvailability, loading, error: apiError } = useDressAPI();
+
     const [dress, setDress] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [selectedImage, setSelectedImage] = useState(0);
     const [booking, setBooking] = useState({
@@ -29,14 +30,11 @@ export default function DressDetail() {
     }, [dressId]);
 
     const fetchDressDetails = async () => {
-        try {
-            const response = await api.get(`/api/dresses/${dressId}`);
-            setDress(response.data);
-        } catch (err) {
-            setError('Failed to fetch dress details');
-            console.error(err);
-        } finally {
-            setLoading(false);
+        const dressData = await getDressById(dressId);
+        if (dressData) {
+            setDress(dressData);
+        } else {
+            setError(apiError || 'Failed to fetch dress details');
         }
     };
 
@@ -47,26 +45,18 @@ export default function DressDetail() {
         }
 
         try {
-            const startTime = new Date(booking.startDate).getTime();
-            const endTime = new Date(booking.endDate).getTime();
-
-            const response = await api.get('/api/bookings/check-availability', {
-                params: {
-                    dressId,
-                    startDate: startTime,
-                    endDate: endTime
-                }
-            });
-
-            setIsAvailable(response.data.available);
-
-            if (response.data.available) {
+            const availability = await checkDressAvailability(dressId, 1);
+            if (availability && availability.isAvailable) {
+                const startTime = new Date(booking.startDate).getTime();
+                const endTime = new Date(booking.endDate).getTime();
                 const days = Math.ceil((endTime - startTime) / (1000 * 60 * 60 * 24));
                 const cost = (dress.rentalPricePerDay * days) + dress.depositAmount;
                 setCalculatedCost(cost);
                 setError('');
+                setIsAvailable(true);
             } else {
                 setError('Dress is not available for selected dates');
+                setIsAvailable(false);
             }
         } catch (err) {
             setError('Error checking availability');

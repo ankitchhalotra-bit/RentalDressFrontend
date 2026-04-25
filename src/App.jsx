@@ -124,7 +124,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-ro
 import { AuthProvider, AuthContext } from './context/AuthContext';
 import AuthPage from './pages/AuthPage';
 import Shop from './pages/Shop';
-import AdminDashboard from './pages/AdminDashboard';
+import AdminPanel from './pages/AdminPanel';
 import DressList from './pages/DressList';
 import DressDetail from './pages/DressDetail';
 import BookingConfirmation from './pages/BookingConfirmation';
@@ -189,7 +189,7 @@ function AppRoutes() {
         } />
         <Route path="/admin" element={
           <ProtectedRoute requiredRole="ROLE_ADMIN">
-            <AdminDashboard />
+            <AdminPanel />
           </ProtectedRoute>
         } />
       </Routes>

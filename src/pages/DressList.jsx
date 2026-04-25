@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api/axiosInstance';
+import { useDressAPI } from '../api/useDressAPI';
 import './DressList.css';
 
 export default function DressList() {
     const navigate = useNavigate();
     const [dresses, setDresses] = useState([]);
-    // ...existing code...
-    const [error, setError] = useState('');
+    const {
+        getAllDresses,
+        searchDresses,
+        getDressesByOccasion,
+        getDressesByPriceRange,
+        loading,
+        error
+    } = useDressAPI();
+
     const [filters, setFilters] = useState({
         searchTerm: '',
         occasion: 'ALL',
@@ -20,16 +27,8 @@ export default function DressList() {
     }, []);
 
     const fetchDresses = async () => {
-        setLoading(true);
-        try {
-            const response = await api.get('/api/dresses');
-            setDresses(response.data);
-        } catch (err) {
-            setError('Failed to fetch dresses');
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
+        const fetchedDresses = await getAllDresses();
+        setDresses(fetchedDresses || []);
     };
 
     const handleSearch = async (e) => {
@@ -37,12 +36,8 @@ export default function DressList() {
         setFilters({ ...filters, searchTerm });
 
         if (searchTerm.trim()) {
-            try {
-                const response = await api.get(`/api/dresses/search?query=${searchTerm}`);
-                setDresses(response.data);
-            } catch (err) {
-                console.error('Search error:', err);
-            }
+            const results = await searchDresses(searchTerm);
+            setDresses(results || []);
         } else {
             fetchDresses();
         }
@@ -52,12 +47,8 @@ export default function DressList() {
         setFilters({ ...filters, occasion });
 
         if (occasion !== 'ALL') {
-            try {
-                const response = await api.get(`/api/dresses/filter/occasion?occasion=${occasion}`);
-                setDresses(response.data);
-            } catch (err) {
-                console.error('Filter error:', err);
-            }
+            const results = await getDressesByOccasion(occasion);
+            setDresses(results || []);
         } else {
             fetchDresses();
         }
@@ -68,18 +59,12 @@ export default function DressList() {
         const newFilters = { ...filters, [name]: parseInt(value) };
         setFilters(newFilters);
 
-        try {
-            const response = await api.get(
-                `/api/dresses/filter/price?minPrice=${newFilters.minPrice}&maxPrice=${newFilters.maxPrice}`
-            );
-            setDresses(response.data);
-        } catch (err) {
-            console.error('Price filter error:', err);
-        }
+        const results = await getDressesByPriceRange(newFilters.minPrice, newFilters.maxPrice);
+        setDresses(results || []);
     };
 
     if (loading) return <div className="dress-list-container"><p>Loading dresses...</p></div>;
-    if (error) return <div className="dress-list-container"><p style={{ color: 'red' }}>{error}</p></div>;
+    if (error) return <div className="dress-list-container"><p style={{ color: 'red' }}>Error: {error}</p></div>;
 
     return (
         <div className="dress-list-container">
@@ -101,10 +86,10 @@ export default function DressList() {
                     <label>Occasion</label>
                     <select value={filters.occasion} onChange={(e) => handleOccasionFilter(e.target.value)}>
                         <option value="ALL">All Occasions</option>
-                        <option value="WEDDING">Wedding</option>
-                        <option value="PARTY">Party</option>
-                        <option value="CASUAL">Casual</option>
-                        <option value="FORMAL">Formal</option>
+                        <option value="Wedding">Wedding</option>
+                        <option value="Party">Party</option>
+                        <option value="Casual">Casual</option>
+                        <option value="Formal">Formal</option>
                     </select>
                 </div>
 
@@ -134,7 +119,7 @@ export default function DressList() {
             <div className="dresses-grid">
                 {dresses.length > 0 ? (
                     dresses.map(dress => (
-                        <DressCard key={dress.id} dress={dress} />
+                        <DressCard key={dress._id || dress.id} dress={dress} />
                     ))
                 ) : (
                     <p>No dresses found</p>
@@ -173,7 +158,7 @@ function DressCard({ dress }) {
 
                 <button
                     className="view-btn"
-                    onClick={() => navigate(`/dresses/${dress.id}`)}
+                    onClick={() => navigate(`/dresses/${dress._id || dress.id}`)}
                 >
                     View Details
                 </button>

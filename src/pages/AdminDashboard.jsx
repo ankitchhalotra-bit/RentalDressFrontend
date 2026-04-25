@@ -1,18 +1,28 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import api from '../api/axiosInstance';
+import { useDressAPI } from '../api/useDressAPI';
 
 const initialForm = { name: '', type: '', price: '', description: '', file: null };
 
 export default function AdminDashboard() {
     const [dresses, setDresses] = useState([]);
+    const [statistics, setStatistics] = useState(null);
+    const [stockSummary, setStockSummary] = useState(null);
     const [form, setForm] = useState(initialForm);
     const [editId, setEditId] = useState(null);
     const [loading, setLoading] = useState(false);
     const [listLoading, setListLoading] = useState(true);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
-    const [activeTab, setActiveTab] = useState('list'); // 'list' | 'add'
+    const [activeTab, setActiveTab] = useState('list'); // 'list' | 'add' | 'stats' | 'stock'
     const [deleteConfirm, setDeleteConfirm] = useState(null);
+
+    const {
+        getAllDressesAdmin,
+        getDressStatistics,
+        getStockSummary,
+        loading: apiLoading,
+        error: apiError
+    } = useDressAPI();
 
     const showSuccess = (msg) => {
         setSuccess(msg);
@@ -29,16 +39,50 @@ export default function AdminDashboard() {
     const fetchDresses = useCallback(async () => {
         setListLoading(true);
         try {
-            const res = await api.get('/api/admin/dresses');
-            setDresses(res.data);
+            const fetchedDresses = await getAllDressesAdmin();
+            setDresses(fetchedDresses || []);
         } catch (e) {
             showError('Failed to load dresses: ' + (e?.response?.data?.error || e.message));
         } finally {
             setListLoading(false);
         }
-    }, []);
+    }, [getAllDressesAdmin]);
 
-    useEffect(() => { fetchDresses(); }, [fetchDresses]);
+    // ── Fetch statistics ──────────────────────────────────────
+    const fetchStatistics = useCallback(async () => {
+        try {
+            const stats = await getDressStatistics();
+            setStatistics(stats);
+        } catch (e) {
+            showError('Failed to load statistics');
+        }
+    }, [getDressStatistics]);
+
+    // ── Fetch stock summary ───────────────────────────────────
+    const fetchStockSummary = useCallback(async () => {
+        try {
+            const summary = await getStockSummary();
+            setStockSummary(summary);
+        } catch (e) {
+            showError('Failed to load stock summary');
+        }
+    }, [getStockSummary]);
+
+    useEffect(() => {
+        fetchDresses();
+    }, [fetchDresses]);
+
+    useEffect(() => {
+        if (activeTab === 'stats') {
+            fetchStatistics();
+        }
+    }, [activeTab, fetchStatistics]);
+
+    useEffect(() => {
+        if (activeTab === 'stock') {
+            fetchStockSummary();
+        }
+    }, [activeTab, fetchStockSummary]);
 
     // ── Handle form field changes ──────────────────────────────
     const handleChange = (e) => {
