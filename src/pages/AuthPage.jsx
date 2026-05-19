@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import api from '../api/axiosInstance';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import './AuthPage.css';
 
 export default function AuthPage() {
     const [isLogin, setIsLogin] = useState(true);
@@ -52,45 +53,47 @@ export default function AuthPage() {
     };
 
     return (
-        <div style={{ padding: '20px' }}>
-            <h2>{isLogin ? 'Login' : 'Register'}</h2>
-            {error && (
-                <p style={{ color: 'red', marginBottom: '10px' }}>{error}</p>
-            )}
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', width: '300px', gap: '10px' }}>
-                {!isLogin && (
+        <div className="auth-bg">
+            <div className="auth-card">
+                <h2>{isLogin ? 'Login' : 'Register'}</h2>
+                {error && (
+                    <div className="error">{error}</div>
+                )}
+                <form onSubmit={handleSubmit}>
+                    {!isLogin && (
+                        <input
+                            type="text"
+                            name="name"
+                            placeholder="Name"
+                            required
+                            value={formData.name}
+                            onChange={handleChange}
+                        />
+                    )}
                     <input
-                        type="text"
-                        name="name"
-                        placeholder="Name"
+                        type="email"
+                        name="email"
+                        placeholder="Email"
                         required
-                        value={formData.name}
+                        value={formData.email}
                         onChange={handleChange}
                     />
-                )}
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                />
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    required
-                    value={formData.password}
-                    onChange={handleChange}
-                />
-                <button type="submit" disabled={loading}>
-                    {loading ? 'Please wait...' : isLogin ? 'Login' : 'Register'}
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Password"
+                        required
+                        value={formData.password}
+                        onChange={handleChange}
+                    />
+                    <button type="submit" disabled={loading}>
+                        {loading ? 'Please wait...' : isLogin ? 'Login' : 'Register'}
+                    </button>
+                </form>
+                <button className="switch-btn" onClick={() => { setIsLogin(!isLogin); setError(''); }}>
+                    Switch to {isLogin ? 'Register' : 'Login'}
                 </button>
-            </form>
-            <button onClick={() => { setIsLogin(!isLogin); setError(''); }} style={{ marginTop: '10px' }}>
-                Switch to {isLogin ? 'Register' : 'Login'}
-            </button>
+            </div>
         </div>
     );
 }

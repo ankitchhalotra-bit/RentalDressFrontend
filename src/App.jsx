@@ -129,6 +129,7 @@ import DressList from './pages/DressList';
 import DressDetail from './pages/DressDetail';
 import BookingConfirmation from './pages/BookingConfirmation';
 import MyBookings from './pages/MyBookings';
+import './pages/MainHeader.css';
 
 const ProtectedRoute = ({ children, requiredRole }) => {
   const { user } = useContext(AuthContext);
@@ -142,31 +143,21 @@ function AppRoutes() {
 
   return (
     <>
-      <nav style={{ padding: '10px', background: '#eee', display: 'flex', gap: '15px', alignItems: 'center' }}>
-        <Link to="/dresses">Browse Dresses</Link>
-        {user && <Link to="/bookings">My Bookings</Link>}
-        {!user && <Link to="/auth">Login / Register</Link>}
-        {user?.role === 'ROLE_ADMIN' && <Link to="/admin">Admin Dashboard</Link>}
-        {user && (
-          <div style={{ marginLeft: 'auto', display: 'flex', gap: '15px', alignItems: 'center' }}>
-            <span style={{ fontSize: '14px', color: '#666' }}>Welcome, {user.email}</span>
-            <button
-              onClick={logout}
-              style={{
-                padding: '5px 15px',
-                backgroundColor: '#ff6b6b',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Logout
-            </button>
-          </div>
-        )}
-      </nav>
-
+      <header className="main-header">
+        <nav className="main-header-nav">
+          <Link to="/dresses">Browse Dresses</Link>
+          {user && <Link to="/bookings">My Bookings</Link>}
+          {!user && <Link to="/auth">Login / Register</Link>}
+          {user?.role === 'ROLE_ADMIN' && <Link to="/admin">Admin Dashboard</Link>}
+          <span className="spacer" />
+          {user && (
+            <div className="user-info">
+              <span>Welcome, {user.email}</span>
+              <button className="logout-btn" onClick={logout}>Logout</button>
+            </div>
+          )}
+        </nav>
+      </header>
       <Routes>
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/" element={<Navigate to="/dresses" />} />

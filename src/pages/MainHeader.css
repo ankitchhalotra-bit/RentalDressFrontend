@@ -1,0 +1,71 @@
+/* Modern, attractive, and responsive header styles for the main navigation */
+.main-header {
+  background: linear-gradient(90deg, #667eea 80%, #a084e8 100%);
+  color: #fff;
+  padding: 0;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.10);
+  border-bottom-left-radius: 18px;
+  border-bottom-right-radius: 18px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.main-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 32px 14px 32px;
+  font-size: 1.08rem;
+  font-weight: 500;
+}
+
+.main-header-nav a {
+  color: #fff;
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+}
+.main-header-nav a:hover, .main-header-nav a.active {
+  background: #ffd700;
+  color: #333;
+}
+
+.main-header-nav .spacer {
+  flex: 1;
+}
+
+.main-header-nav .user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.98rem;
+  color: #e0e7ff;
+}
+
+.main-header-nav .logout-btn {
+  background: linear-gradient(90deg, #ff6b6b 60%, #ffb199 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 7px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.08);
+}
+.main-header-nav .logout-btn:hover {
+  background: #ff5252;
+  color: #fff;
+}
+
+@media (max-width: 700px) {
+  .main-header-nav {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px 8vw 10px 8vw;
+  }
+}
+
