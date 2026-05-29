@@ -93,6 +93,17 @@ export default function AuthPage() {
                 <button className="switch-btn" onClick={() => { setIsLogin(!isLogin); setError(''); }}>
                     Switch to {isLogin ? 'Register' : 'Login'}
                 </button>
+                <button
+                    type="button"
+                    className="google-login-btn"
+                    onClick={() => {
+                        window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+                    }}
+                    style={{ marginBottom: '10px', background: '#fff', color: '#444', border: '1px solid #ddd', borderRadius: '6px', padding: '10px 0', fontWeight: 600, fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', cursor: 'pointer', boxShadow: '0 2px 8px rgba(102,126,234,0.06)' }}
+                >
+                    <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" style={{ width: 22, height: 22 }} />
+                    Login with Google
+                </button>
             </div>
         </div>
     );

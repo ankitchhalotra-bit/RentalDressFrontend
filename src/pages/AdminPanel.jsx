@@ -131,22 +131,24 @@ export default function AdminPanel() {
   const handleUpdateDress = async (e) => {
     e.preventDefault();
     if (!editingId) return;
-
     setLoading2(true);
     try {
-      const updateData = {
-        name: formData.name,
-        occasion: formData.occasion,
-        rentalPricePerDay: parseFloat(formData.rentalPricePerDay),
-        depositAmount: parseFloat(formData.depositAmount),
-        description: formData.description,
-        material: formData.material,
-        totalStock: parseInt(formData.totalStock),
-        colors: formData.colors.split(',').map(c => c.trim()),
-        sizes: formData.sizes.split(',').map(s => s.trim())
-      };
+      const formDataMultipart = new FormData();
+      formDataMultipart.append('name', formData.name);
+      formDataMultipart.append('occasion', formData.occasion);
+      formDataMultipart.append('rentalPricePerDay', formData.rentalPricePerDay);
+      formDataMultipart.append('depositAmount', formData.depositAmount);
+      formDataMultipart.append('description', formData.description);
+      formDataMultipart.append('totalStock', formData.totalStock);
+      formDataMultipart.append('material', formData.material);
+      formDataMultipart.append('colors', formData.colors);
+      formDataMultipart.append('sizes', formData.sizes);
+      formDataMultipart.append('categoryId', formData.categoryId);
+      if (file) formDataMultipart.append('file', file);
 
-      await api.put(`/api/dresses/${editingId}`, updateData);
+      await api.put(`/api/admin/dress/${editingId}`, formDataMultipart, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
 
       showMessage('Dress updated successfully!', 'success');
       resetForm();
@@ -549,4 +551,3 @@ export default function AdminPanel() {
     </div>
   );
 }
-
